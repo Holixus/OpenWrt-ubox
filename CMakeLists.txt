@@ -11,6 +11,10 @@ IF(APPLE)
 ENDIF()
 
 find_library(json NAMES json-c json)
+find_library(ubox_lib NAMES ubox)
+find_library(ubus_lib NAMES ubus)
+find_library(uci_lib NAMES uci)
+find_library(blobmsg_json_lib NAMES blobmsg_json)
 
 IF(DEBUG)
   ADD_DEFINITIONS(-DDEBUG -g3)
@@ -29,14 +33,14 @@ ELSE()
 ENDIF()
 
 ADD_EXECUTABLE(kmodloader kmodloader.c)
-TARGET_LINK_LIBRARIES(kmodloader ubox)
+TARGET_LINK_LIBRARIES(kmodloader ${ubox_lib})
 
 INSTALL(TARGETS kmodloader
 	RUNTIME DESTINATION sbin
 )
 
 ADD_EXECUTABLE(lsbloader lsbloader.c)
-TARGET_LINK_LIBRARIES(lsbloader ubox ubus)
+TARGET_LINK_LIBRARIES(lsbloader ${ubox_lib} ${ubus_lib})
 
 INSTALL(TARGETS lsbloader
 	RUNTIME DESTINATION sbin
@@ -51,19 +55,19 @@ FIND_PATH(uci_include_dir uci.h)
 INCLUDE_DIRECTORIES(${uci_include_dir})
 
 ADD_EXECUTABLE(validate_data validate/cli.c)
-TARGET_LINK_LIBRARIES(validate_data ubox uci validate)
+TARGET_LINK_LIBRARIES(validate_data ${ubox_lib} ${uci_lib} validate)
 INSTALL(TARGETS validate_data
 	RUNTIME DESTINATION sbin
 )
 
 ADD_EXECUTABLE(logd log/logd.c log/syslog.c)
-TARGET_LINK_LIBRARIES(logd ubox ubus)
+TARGET_LINK_LIBRARIES(logd ${ubox_lib} ${ubus_lib})
 INSTALL(TARGETS logd
 	RUNTIME DESTINATION sbin
 )
 
 ADD_EXECUTABLE(logread log/logread.c)
-TARGET_LINK_LIBRARIES(logread ubox ubus ${json} blobmsg_json)
+TARGET_LINK_LIBRARIES(logread ${ubox_lib} ${ubus_lib} ${json} ${blobmsg_json_lib})
 INSTALL(TARGETS logread
 	RUNTIME DESTINATION sbin
 )
